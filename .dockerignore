@@ -1,0 +1,13 @@
+node_modules
+.next
+.git
+.github
+cypress
+coverage
+*.md
+!README.md
+Dockerfile
+.dockerignore
+.env*
+*.pem
+*.key

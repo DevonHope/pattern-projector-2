@@ -9,11 +9,18 @@ import type {
 import { PDFPageProxy } from "pdfjs-dist";
 import { PDF_TO_CSS_UNITS } from "@/_lib/pixels-per-inch";
 import { erodeImageData, erosionFilter } from "@/_lib/erode";
+import { setLineWeightHook } from "@/_lib/line-weight";
 import useRenderContext from "@/_hooks/use-render-context";
 
 export default function CustomRenderer() {
-  const { erosions, layers, magnifying, onPageRenderSuccess, patternScale } =
-    useRenderContext();
+  const {
+    erosions,
+    lineWeight,
+    layers,
+    magnifying,
+    onPageRenderSuccess,
+    patternScale,
+  } = useRenderContext();
   const pageContext = usePageContext();
 
   invariant(pageContext, "Unable to find Page context.");
@@ -98,6 +105,8 @@ export default function CustomRenderer() {
     if (!ctx) {
       return;
     }
+    setLineWeightHook(ctx, lineWeight, renderViewport.scale);
+
     const renderContext: RenderParameters = {
       canvasContext: ctx as any,
       viewport: renderViewport,
@@ -147,6 +156,7 @@ export default function CustomRenderer() {
     layers,
     pdf,
     erosions,
+    lineWeight,
     filter,
     renderErosions,
     renderWidth,

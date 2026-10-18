@@ -7,6 +7,7 @@ import { Button } from "./buttons/button";
 import ModalFigure from "./modal/modal-figure";
 import { ModalSubtitle } from "./modal/modal-subtitle";
 import { useState } from "react";
+import { withBasePath } from "@/_lib/base-path";
 
 export default function TroubleshootingButton({
   isDarkTheme,
@@ -38,20 +39,20 @@ export default function TroubleshootingButton({
         </div>
         <ModalText>{t("dragCorners.description")}</ModalText>
         <ModalText>{t("inputMeasurement")}</ModalText>
-        <ModalFigure src="/correct.jpg" caption={t("dragCorners.caption")} />
+        <ModalFigure src={withBasePath("/correct.jpg")} caption={t("dragCorners.caption")} />
         <ModalSubtitle>{t("offByOne.title")}</ModalSubtitle>
         <ModalText>{t("offByOne.description")}</ModalText>
-        <ModalFigure src="/off-by-one.jpg" caption={t("offByOne.caption")} />
+        <ModalFigure src={withBasePath("/off-by-one.jpg")} caption={t("offByOne.caption")} />
         <ModalSubtitle>{t("unevenSurface.title")}</ModalSubtitle>
         <ModalText>{t("unevenSurface.description")}</ModalText>
         <ModalFigure
-          src="/uneven-surface.jpg"
+          src={withBasePath("/uneven-surface.jpg")}
           caption={t("unevenSurface.caption")}
         />
         <ModalSubtitle>{t("dimensionsSwapped.title")}</ModalSubtitle>
         <ModalText>{t("dimensionsSwapped.description")}</ModalText>
         <ModalFigure
-          src="/dimensions-swapped.jpg"
+          src={withBasePath("/dimensions-swapped.jpg")}
           caption={t("dimensionsSwapped.caption")}
         />
         <ModalActions>

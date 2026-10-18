@@ -19,8 +19,8 @@ export const metadata: Metadata = {
   viewport:
     "width=device-width, initial-scale=1, minimum-scale=1, maximum-scale=1, user-scalable=no",
   applicationName: APP_TITLE,
+  manifest: `${process.env.NEXT_PUBLIC_BASE_PATH ?? ""}/site.webmanifest`,
   title: APP_TITLE,
-  manifest: "/manifest.json",
   appleWebApp: {
     capable: true,
     statusBarStyle: "default",
@@ -69,7 +69,9 @@ export default function LocaleLayout({
           {children}
         </NextIntlClientProvider>
       </body>
-      <GoogleAnalytics gaId="G-JP1MLBQSKC" />
+      {process.env.NEXT_PUBLIC_GA_ID ? (
+        <GoogleAnalytics gaId={process.env.NEXT_PUBLIC_GA_ID} />
+      ) : null}
     </html>
   );
 }

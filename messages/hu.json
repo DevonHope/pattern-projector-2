@@ -22,5 +22,15 @@
             "connect": "Csatlakoztassa a számítógépét vagy táblagépét a projektorhoz, és vagy kettőzze meg vagy terjessze ki a kijelzőt úgy, hogy a számítógépen vagy táblagépen található képet vetítse ki a projektor.",
             "focus": "Állítsa be a fókuszt a projektoron addig, amíg nem lesz teljesen éles a kivetített kép közepén található szöveg. Amennyiben sehogyan sem lesz éles a kép, ellenőrizze, hogy a projektor és a vágólap közötti távolság a gyártó által ajánlott értékek között van-e."
         }
-    }
+    },
+  "LineWeightMenu": {
+    "title": "Line weight",
+    "scale": "Line scale",
+    "scaleHelp": "Multiplies the width of every line in the pattern. Below 1× makes lines thinner, above 1× thicker. Lines stay sharp.",
+    "minimum": "Minimum line width",
+    "minimumHelp": "No line is drawn thinner than this on the mat (needs calibration). PDF only.",
+    "off": "Off",
+    "thicken": "Extra pixel thickening",
+    "reset": "Reset"
+  }
 }

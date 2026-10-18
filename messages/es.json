@@ -355,5 +355,15 @@
         "scale": "Patrón de escala",
         "hide": "Ocultar menú de escala",
         "show": "Mostrar menú de escala"
-    }
+    },
+  "LineWeightMenu": {
+    "title": "Line weight",
+    "scale": "Line scale",
+    "scaleHelp": "Multiplies the width of every line in the pattern. Below 1× makes lines thinner, above 1× thicker. Lines stay sharp.",
+    "minimum": "Minimum line width",
+    "minimumHelp": "No line is drawn thinner than this on the mat (needs calibration). PDF only.",
+    "off": "Off",
+    "thicken": "Extra pixel thickening",
+    "reset": "Reset"
+  }
 }

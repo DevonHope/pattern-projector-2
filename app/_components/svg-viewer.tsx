@@ -1,5 +1,6 @@
 import { Layers } from "@/_lib/layers";
 import { LoadStatusEnum } from "@/_lib/load-status-enum";
+import { LineWeight, applyLineWeightToSvg } from "@/_lib/line-weight";
 import { MenuStates, getDefaultMenuStates } from "@/_lib/menu-states";
 import {
   CSSProperties,
@@ -21,6 +22,7 @@ export default function SvgViewer({
   patternScale,
   setMenuStates,
   patternScaleFactor,
+  lineWeight,
 }: {
   dataUrl: string;
   svgStyle: CSSProperties;
@@ -33,6 +35,7 @@ export default function SvgViewer({
   patternScale: number;
   setMenuStates: Dispatch<SetStateAction<MenuStates>>;
   patternScaleFactor: number;
+  lineWeight: LineWeight;
 }) {
   const objectRef = useRef<HTMLObjectElement>(null);
 
@@ -53,6 +56,12 @@ export default function SvgViewer({
     if (!svg) return;
     svg.setAttribute("style", imageStyle);
   }, [imageStyle]);
+
+  useEffect(() => {
+    const svg = objectRef.current?.contentDocument?.querySelector("svg");
+    if (!svg) return;
+    applyLineWeightToSvg(svg, lineWeight);
+  }, [lineWeight]);
 
   useEffect(() => {
     const svg = objectRef.current?.contentDocument?.querySelector("svg");
@@ -95,6 +104,7 @@ export default function SvgViewer({
         setLayoutWidth(svg.width.baseVal.value * patternScale);
         setLayoutHeight(svg.height.baseVal.value * patternScale);
         setPageCount(1);
+        applyLineWeightToSvg(svg, lineWeight);
         // get all groups at the root if the svg
         const groupLayers: Layers = {};
         Array.from(svg.querySelectorAll(`g`))
