@@ -55,3 +55,7 @@ next-env.d.ts
 /public/worker-*.js.map
 /public/fallback-*.js/
 public/swe-worker-*.js*
+
+# local secrets
+.env
+.env.*
