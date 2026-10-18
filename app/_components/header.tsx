@@ -40,6 +40,8 @@ import { DropdownCheckboxIconButton } from "@/_components/buttons/dropdown-check
 import Tooltip from "@/_components/tooltip/tooltip";
 import ExpandLessIcon from "@/_icons/expand-less-icon";
 import LineWeightIcon from "@/_icons/line-weight-icon";
+import LineWeightButton from "@/_components/buttons/line-weight-button";
+import { LineWeight } from "@/_lib/line-weight";
 import { useKeyDown } from "@/_hooks/use-key-down";
 import { KeyCode } from "@/_lib/key-code";
 import { MenuStates } from "@/_lib/menu-states";
@@ -68,6 +70,7 @@ import MailIcon from "@/_icons/mail-icon";
 import ZoomInIcon from "@/_icons/zoom-in-icon";
 import { acceptedMimeTypes } from "@/_lib/is-valid-file";
 import { toggleFullScreen } from "@/_lib/full-screen";
+import { withBasePath } from "@/_lib/base-path";
 
 export default function Header({
   isCalibrating,
@@ -89,6 +92,8 @@ export default function Header({
   layoutHeight,
   lineThickness,
   setLineThickness,
+  lineWeight,
+  setLineWeight,
   measuring,
   setMeasuring,
   menuStates,
@@ -128,6 +133,8 @@ export default function Header({
   layoutHeight: number;
   lineThickness: number;
   setLineThickness: (newThickness: number) => void;
+  lineWeight: LineWeight;
+  setLineWeight: (newLineWeight: LineWeight) => void;
   measuring: boolean;
   setMeasuring: Dispatch<SetStateAction<boolean>>;
   menuStates: MenuStates;
@@ -264,40 +271,6 @@ export default function Header({
     },
   };
 
-  const lineThicknessOptions = [
-    {
-      text: "0px",
-      value: 0,
-    },
-    {
-      text: "1px",
-      value: 1,
-    },
-    {
-      text: "2px",
-      value: 2,
-    },
-    {
-      text: "3px",
-      value: 3,
-    },
-    {
-      text: "4px",
-      value: 4,
-    },
-    {
-      text: "5px",
-      value: 5,
-    },
-    {
-      text: "6px",
-      value: 6,
-    },
-    {
-      text: "7px",
-      value: 7,
-    },
-  ];
 
   useEffect(() => {
     const mailReadDate = localStorage.getItem("mailRead");
@@ -456,14 +429,13 @@ export default function Header({
               />
             )}
             {!isCalibrating && (
-              <DropdownIconButton
+              <LineWeightButton
                 loadStatus={lineThicknessStatus}
-                dropdownClassName="w-fit -left-5"
-                description={t("lineWeight")}
                 icon={<LineWeightIcon ariaLabel={t("lineWeight")} />}
-                options={lineThicknessOptions}
-                setSelection={setLineThickness}
-                selection={lineThickness}
+                lineWeight={lineWeight}
+                setLineWeight={setLineWeight}
+                lineThickness={lineThickness}
+                setLineThickness={setLineThickness}
               />
             )}
           </div>
@@ -630,7 +602,7 @@ export default function Header({
               {isCalibrating ? t("project") : t("calibrate")}
             </Button>
             <Tooltip description={t("info")} className={visible(isCalibrating)}>
-              <IconButton href="/">
+              <IconButton href={withBasePath("/")}>
                 <InfoIcon ariaLabel={t("info")} />
               </IconButton>
             </Tooltip>

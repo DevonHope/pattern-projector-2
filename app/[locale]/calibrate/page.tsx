@@ -73,6 +73,11 @@ import { ModalText } from "@/_components/modal/modal-text";
 import { ModalActions } from "@/_components/modal/modal-actions";
 import { Button } from "@/_components/buttons/button";
 import { erosionFilter } from "@/_lib/erode";
+import {
+  DEFAULT_LINE_WEIGHT,
+  LineWeight,
+  parseLineWeight,
+} from "@/_lib/line-weight";
 import SvgViewer from "@/_components/svg-viewer";
 import { toggleFullScreen } from "@/_lib/full-screen";
 
@@ -119,6 +124,8 @@ export default function Page() {
   const [layoutWidth, setLayoutWidth] = useState<number>(0);
   const [layoutHeight, setLayoutHeight] = useState<number>(0);
   const [lineThickness, setLineThickness] = useState<number>(0);
+  const [lineWeight, setLineWeight] =
+    useState<LineWeight>(DEFAULT_LINE_WEIGHT);
   const [measuring, setMeasuring] = useState<boolean>(false);
   const [magnifying, setMagnifying] = useState<boolean>(false);
   const [zoomedOut, setZoomedOut] = useState<boolean>(false);
@@ -301,6 +308,9 @@ export default function Page() {
       } else {
         setLineThickness(0);
       }
+      setLineWeight(
+        parseLineWeight(localStorage.getItem(`lineWeight:${files[0].name}`)),
+      );
 
       const key = `stitchSettings:${files[0].name ?? "default"}`;
       const stitchSettingsString = localStorage.getItem(key);
@@ -639,6 +649,7 @@ export default function Page() {
                     setLayoutWidth={setLayoutWidth}
                     setLayoutHeight={setLayoutHeight}
                     lineThickness={lineThickness}
+                    lineWeight={lineWeight}
                     stitchSettings={stitchSettings}
                     filter={themeFilter(displaySettings.theme)}
                     dispatchStitchSettings={dispatchStitchSettings}
@@ -666,6 +677,7 @@ export default function Page() {
                     patternScale={patternScaleFactor}
                     setMenuStates={setMenuStates}
                     patternScaleFactor={patternScaleFactor}
+                    lineWeight={lineWeight}
                   />
                 )}
               </Draggable>
@@ -729,6 +741,16 @@ export default function Page() {
                       localStorage.setItem(
                         `lineThickness:${file.name}`,
                         String(newLineThickness),
+                      );
+                    }
+                  }}
+                  lineWeight={lineWeight}
+                  setLineWeight={(newLineWeight) => {
+                    setLineWeight(newLineWeight);
+                    if (file) {
+                      localStorage.setItem(
+                        `lineWeight:${file.name}`,
+                        JSON.stringify(newLineWeight),
                       );
                     }
                   }}

@@ -23,6 +23,7 @@ import {
 import { StitchSettingsAction } from "@/_reducers/stitchSettingsReducer";
 import { getLayersFromPdf, Layers } from "@/_lib/layers";
 import { LoadStatusEnum } from "@/_lib/load-status-enum";
+import { LineWeight } from "@/_lib/line-weight";
 import { Point } from "@/_lib/point";
 import { useTranslations } from "next-intl";
 import { MenuStates, getDefaultMenuStates } from "@/_lib/menu-states";
@@ -42,6 +43,7 @@ export default function PdfViewer({
   dispatchStitchSettings,
   pageCount,
   lineThickness,
+  lineWeight,
   stitchSettings,
   filter,
   magnifying,
@@ -60,6 +62,7 @@ export default function PdfViewer({
   dispatchStitchSettings: Dispatch<StitchSettingsAction>;
   pageCount: number;
   lineThickness: number;
+  lineWeight: LineWeight;
   stitchSettings: StitchSettings;
   filter: string;
   magnifying: boolean;
@@ -205,6 +208,7 @@ export default function PdfViewer({
                 <RenderContext.Provider
                   value={{
                     erosions: lineThickness,
+                    lineWeight,
                     layers,
                     magnifying,
                     onPageRenderSuccess,

@@ -10,6 +10,7 @@ import { Link } from "navigation";
 import ModalFigure from "./modal/modal-figure";
 import { ButtonStyle } from "./theme/styles";
 import { ModalList } from "./modal/modal-list";
+import { withBasePath } from "@/_lib/base-path";
 
 export default function MailModal({
   open,
@@ -145,7 +146,7 @@ export default function MailModal({
             feature in the video, but here’s a screenshot:
           </ModalText>
           <ModalFigure
-            src="/open-with.png"
+            src={withBasePath("/open-with.png")}
             caption="New 'Open With Pattern Projector' option on desktop"
           />
 
