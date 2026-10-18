@@ -340,5 +340,13 @@
     "off": "Off",
     "thicken": "Extra pixel thickening",
     "reset": "Reset"
+  },
+  "MatPresets": {
+    "preset": "Mat size",
+    "tooltip": "Choose a preset mat or paper size",
+    "isoA": "A sizes (ISO 216)",
+    "us": "US paper (ANSI)",
+    "arch": "US architectural",
+    "britishImperial": "British imperial"
   }
 }

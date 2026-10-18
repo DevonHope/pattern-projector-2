@@ -12,6 +12,7 @@ import { FullScreenHandle } from "react-full-screen";
 
 import InlineInput from "@/_components/inline-input";
 import InlineSelect from "@/_components/inline-select";
+import MatPresetSelect from "@/_components/mat-preset-select";
 import DeleteIcon from "@/_icons/delete-icon";
 import FlipHorizontalIcon from "@/_icons/flip-horizontal-icon";
 import FlipVerticalIcon from "@/_icons/flip-vertical-icon";
@@ -81,6 +82,7 @@ export default function Header({
   height,
   handleHeightChange,
   handleWidthChange,
+  handleMatPreset,
   handleResetCalibration,
   handleFileChange,
   fullScreenHandle,
@@ -122,6 +124,11 @@ export default function Header({
   height: number;
   handleHeightChange: (e: ChangeEvent<HTMLInputElement>) => void;
   handleWidthChange: (e: ChangeEvent<HTMLInputElement>) => void;
+  handleMatPreset: (
+    width: string,
+    height: string,
+    unitOfMeasure: string,
+  ) => void;
   handleFileChange: (e: ChangeEvent<HTMLInputElement>) => void;
   handleResetCalibration: () => void;
   fullScreenHandle: FullScreenHandle;
@@ -474,6 +481,12 @@ export default function Header({
                   { value: IN, label: "in" },
                   { value: CM, label: "cm" },
                 ]}
+              />
+              <MatPresetSelect
+                widthInput={widthInput}
+                heightInput={heightInput}
+                unitOfMeasure={unitOfMeasure}
+                onSelect={handleMatPreset}
               />
             </div>
             <Tooltip description={t("delete")}>
