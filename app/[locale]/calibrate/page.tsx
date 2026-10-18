@@ -286,6 +286,14 @@ export default function Page() {
     updateLocalSettings({ width: w });
   }
 
+  // Apply a mat size preset: width, height and unit together
+  function handleMatPreset(w: string, h: string, unit: string) {
+    setWidthInput(w);
+    setHeightInput(h);
+    setUnitOfMeasure(unit);
+    updateLocalSettings({ width: w, height: h, unitOfMeasure: unit });
+  }
+
   // Set new file; reset file based state; and if available, load file based state from localStorage
   function handleFileChange(e: ChangeEvent<HTMLInputElement>): void {
     const { files } = e.target;
@@ -709,6 +717,7 @@ export default function Page() {
                   height={height}
                   handleHeightChange={handleHeightChange}
                   handleWidthChange={handleWidthChange}
+                  handleMatPreset={handleMatPreset}
                   handleResetCalibration={() => {
                     localStorage.setItem(
                       "calibrationContext",
