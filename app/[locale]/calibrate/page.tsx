@@ -421,6 +421,39 @@ export default function Page() {
     }
   });
 
+  // Open a pattern handed over by another app on the same site, e.g.
+  // /pattern-projector/calibrate?src=/garment-studio/api/jobs/<id>/pattern.pdf
+  // Only same-origin paths are fetched, so links can't pull in outside files.
+  useEffect(() => {
+    const src = new URLSearchParams(window.location.search).get("src");
+    if (!src || !src.startsWith("/") || src.startsWith("//")) return;
+    let cancelled = false;
+    (async () => {
+      try {
+        const res = await fetch(src, { credentials: "same-origin" });
+        if (!res.ok || cancelled) return;
+        const blob = await res.blob();
+        const name =
+          new URLSearchParams(window.location.search).get("name") ||
+          src.split("?")[0].split("/").pop() ||
+          "pattern.pdf";
+        const type = (blob.type || "").split(";")[0];
+        const opened = new File([blob], name, { type });
+        if (cancelled) return;
+        handleFileChange({
+          target: { files: [opened] },
+        } as unknown as ChangeEvent<HTMLInputElement>);
+      } catch (e) {
+        console.error("Could not open pattern from URL", e);
+      }
+    })();
+    return () => {
+      cancelled = true;
+    };
+    // Run once on load.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
   // Remove buy me a coffee button when calibrating and projecting
   useEffect(() => {
     const element = document.getElementById("bmc-wbtn");
