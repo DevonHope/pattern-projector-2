@@ -52,6 +52,7 @@ export default function PdfViewer({
   gridCenter,
   patternScale,
   setMenuStates,
+  onDocument,
 }: {
   file: any;
   layers: Layers;
@@ -71,6 +72,7 @@ export default function PdfViewer({
   gridCenter: Point;
   patternScale: number;
   setMenuStates: Dispatch<SetStateAction<MenuStates>>;
+  onDocument?: (doc: PDFDocumentProxy) => void;
 }) {
   const [pageSizes, setPageSize] = useReducer(
     pageSizeReducer,
@@ -80,6 +82,7 @@ export default function PdfViewer({
   const t = useTranslations("PdfViewer");
 
   function onDocumentLoadSuccess(docProxy: PDFDocumentProxy) {
+    onDocument?.(docProxy);
     const numPages = docProxy.numPages;
     setPageCount(numPages);
     setPageSize({ action: "clear" });

@@ -5,12 +5,14 @@ export interface MenuStates {
   layers: boolean;
   stitch: boolean;
   scale: boolean;
+  pieces: boolean;
 }
 
 export enum SideMenuType {
   layers = "layers",
   stitch = "stitch",
   scale = "scale",
+  pieces = "pieces",
 }
 
 export function toggleSideMenuStates(
@@ -29,6 +31,7 @@ export function getDefaultMenuStates(): MenuStates {
     layers: false,
     stitch: false,
     scale: false,
+    pieces: false,
   };
 }
 
@@ -37,7 +40,13 @@ export function getMenuStatesFromPageCount(
   pageCount: number,
 ) {
   if (pageCount > 1) {
-    return { nav: true, layers: false, scale: false, stitch: true };
+    return {
+      nav: true,
+      layers: false,
+      scale: false,
+      stitch: true,
+      pieces: false,
+    };
   } else {
     return menuStates;
   }
@@ -54,6 +63,7 @@ export function getMenuStatesFromLayers(
       nav: true,
       stitch: false,
       scale: false,
+      pieces: false,
       layers: Object.keys(layers).length > 0,
     };
   }

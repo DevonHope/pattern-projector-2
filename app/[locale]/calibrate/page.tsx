@@ -80,6 +80,12 @@ import {
 } from "@/_lib/line-weight";
 import SvgViewer from "@/_components/svg-viewer";
 import { toggleFullScreen } from "@/_lib/full-screen";
+import type { PDFDocumentProxy } from "pdfjs-dist";
+import { useVectorPattern } from "@/_hooks/use-vector-pattern";
+import VectorPatternView from "@/_components/vector-pattern";
+import { extractPdf } from "@/_lib/vector/pdf-extract";
+import { extractSvg } from "@/_lib/vector/svg-extract";
+import { PDF_TO_CSS_UNITS } from "@/_lib/pixels-per-inch";
 
 const defaultStitchSettings = {
   lineCount: 1,
@@ -124,8 +130,7 @@ export default function Page() {
   const [layoutWidth, setLayoutWidth] = useState<number>(0);
   const [layoutHeight, setLayoutHeight] = useState<number>(0);
   const [lineThickness, setLineThickness] = useState<number>(0);
-  const [lineWeight, setLineWeight] =
-    useState<LineWeight>(DEFAULT_LINE_WEIGHT);
+  const [lineWeight, setLineWeight] = useState<LineWeight>(DEFAULT_LINE_WEIGHT);
   const [measuring, setMeasuring] = useState<boolean>(false);
   const [magnifying, setMagnifying] = useState<boolean>(false);
   const [zoomedOut, setZoomedOut] = useState<boolean>(false);
@@ -166,6 +171,79 @@ export default function Page() {
 
   const t = useTranslations("Header");
   const g = useTranslations("General");
+
+  // Vector pieces: the pattern's own lines, split into one layer per piece.
+  const patternRef = useRef<HTMLDivElement>(null);
+  const [pdfDocument, setPdfDocument] = useState<PDFDocumentProxy | null>(null);
+  const pm = useTranslations("PiecesMenu");
+  const hiddenLayerIds = useMemo(
+    () =>
+      new Set(
+        Object.values(layers)
+          .filter((layer) => !layer.visible)
+          .flatMap((layer) => layer.ids),
+      ),
+    [layers],
+  );
+  const vectorSig = [
+    file?.name,
+    layoutWidth.toFixed(1),
+    layoutHeight.toFixed(1),
+    stitchSettings.pageRange,
+    stitchSettings.lineCount,
+    stitchSettings.lineDirection,
+    stitchSettings.edgeInsets.horizontal,
+    stitchSettings.edgeInsets.vertical,
+    patternScaleFactor,
+  ].join("|");
+  const vectorSource = useCallback(async () => {
+    const root = patternRef.current;
+    if (!root || !file) return null;
+    if (file.type === "application/pdf") {
+      if (!pdfDocument) return null;
+      const placements = Array.from(
+        root.querySelectorAll<HTMLElement>(".react-pdf__Page"),
+      )
+        .map((el) => {
+          // Offsets ignore the calibration transform, so these are layout px.
+          let x = 0;
+          let y = 0;
+          let node: HTMLElement | null = el;
+          while (node && node !== root) {
+            x += node.offsetLeft;
+            y += node.offsetTop;
+            node = node.offsetParent as HTMLElement | null;
+          }
+          return { pageNumber: Number(el.dataset.pageNumber), x, y };
+        })
+        .filter((p) => p.pageNumber > 0);
+      if (placements.length === 0) return null;
+      return extractPdf(
+        pdfDocument,
+        placements,
+        PDF_TO_CSS_UNITS * patternScaleFactor,
+        layoutWidth,
+        layoutHeight,
+      );
+    }
+    const svg = root
+      .querySelector("object")
+      ?.contentDocument?.querySelector("svg");
+    if (!svg) return null;
+    return extractSvg(
+      svg as SVGSVGElement,
+      patternScaleFactor,
+      layoutWidth,
+      layoutHeight,
+    );
+  }, [file, pdfDocument, patternScaleFactor, layoutWidth, layoutHeight]);
+  const vector = useVectorPattern({
+    fileName: file?.name ?? null,
+    sig: vectorSig,
+    source: vectorSource,
+    pieceLabel: (n) => pm("piece", { n }),
+    layerLabel: (n) => pm("layer", { n }),
+  });
 
   const IDLE_TIMEOUT = 8000;
 
@@ -680,45 +758,69 @@ export default function Page() {
                 menuStates={menuStates}
                 file={file}
               >
-                {file === null || file.type === "application/pdf" ? (
-                  <PdfViewer
-                    file={file}
-                    setPageCount={setPageCount}
-                    pageCount={pageCount}
-                    setLayers={setLayers}
-                    layers={layers}
-                    setLayoutWidth={setLayoutWidth}
-                    setLayoutHeight={setLayoutHeight}
-                    lineThickness={lineThickness}
+                <div
+                  ref={patternRef}
+                  className="relative"
+                  style={{
+                    visibility:
+                      vector.ready || vector.patternHidden
+                        ? "hidden"
+                        : "visible",
+                  }}
+                >
+                  {file === null || file.type === "application/pdf" ? (
+                    <PdfViewer
+                      file={file}
+                      setPageCount={setPageCount}
+                      pageCount={pageCount}
+                      setLayers={setLayers}
+                      layers={layers}
+                      setLayoutWidth={setLayoutWidth}
+                      setLayoutHeight={setLayoutHeight}
+                      lineThickness={lineThickness}
+                      lineWeight={lineWeight}
+                      stitchSettings={stitchSettings}
+                      filter={themeFilter(displaySettings.theme)}
+                      dispatchStitchSettings={dispatchStitchSettings}
+                      setLineThicknessStatus={setLineThicknessStatus}
+                      setFileLoadStatus={setFileLoadStatus}
+                      magnifying={magnifying}
+                      gridCenter={getCalibrationCenterPoint(
+                        width,
+                        height,
+                        unitOfMeasure,
+                      )}
+                      patternScale={patternScaleFactor}
+                      setMenuStates={setMenuStates}
+                      onDocument={setPdfDocument}
+                    />
+                  ) : (
+                    <SvgViewer
+                      dataUrl={dataUrl ?? ""}
+                      setFileLoadStatus={setFileLoadStatus}
+                      setLayoutWidth={setLayoutWidth}
+                      setLayoutHeight={setLayoutHeight}
+                      setPageCount={setPageCount}
+                      layers={layers}
+                      setLayers={setLayers}
+                      svgStyle={svgStyle}
+                      patternScale={patternScaleFactor}
+                      setMenuStates={setMenuStates}
+                      patternScaleFactor={patternScaleFactor}
+                      lineWeight={lineWeight}
+                    />
+                  )}
+                </div>
+                {vector.ready && (
+                  <VectorPatternView
+                    vector={vector}
+                    perspective={perspective}
                     lineWeight={lineWeight}
-                    stitchSettings={stitchSettings}
-                    filter={themeFilter(displaySettings.theme)}
-                    dispatchStitchSettings={dispatchStitchSettings}
-                    setLineThicknessStatus={setLineThicknessStatus}
-                    setFileLoadStatus={setFileLoadStatus}
-                    magnifying={magnifying}
-                    gridCenter={getCalibrationCenterPoint(
-                      width,
-                      height,
-                      unitOfMeasure,
-                    )}
-                    patternScale={patternScaleFactor}
-                    setMenuStates={setMenuStates}
-                  />
-                ) : (
-                  <SvgViewer
-                    dataUrl={dataUrl ?? ""}
-                    setFileLoadStatus={setFileLoadStatus}
-                    setLayoutWidth={setLayoutWidth}
-                    setLayoutHeight={setLayoutHeight}
-                    setPageCount={setPageCount}
-                    layers={layers}
-                    setLayers={setLayers}
-                    svgStyle={svgStyle}
-                    patternScale={patternScaleFactor}
-                    setMenuStates={setMenuStates}
-                    patternScaleFactor={patternScaleFactor}
-                    lineWeight={lineWeight}
+                    hidden={hiddenLayerIds}
+                    filter={svgStyle.filter}
+                    width={layoutWidth}
+                    height={layoutHeight}
+                    interactive={!magnifying && !zoomedOut && !isCalibrating}
                   />
                 )}
               </Draggable>
@@ -839,6 +941,12 @@ export default function Page() {
                   dispatchStitchSettings={dispatchStitchSettings}
                   patternScale={patternScale}
                   dispatchPatternScaleAction={dispatchPatternScaleAction}
+                  vector={vector}
+                  canFindPieces={
+                    fileLoadStatus === LoadStatusEnum.SUCCESS && layoutWidth > 0
+                  }
+                  lineWeight={lineWeight}
+                  hiddenLayerIds={hiddenLayerIds}
                 />
               )}
             </menu>
