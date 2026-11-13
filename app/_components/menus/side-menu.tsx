@@ -18,6 +18,10 @@ import { StitchSettings } from "@/_lib/interfaces/stitch-settings";
 import { LayerAction } from "@/_reducers/layersReducer";
 import { PatternScaleAction } from "@/_reducers/patternScaleReducer";
 import TuneIcon from "@/_icons/tune-icon";
+import ScissorsIcon from "@/_icons/scissors-icon";
+import PiecesMenu from "@/_components/menus/pieces-menu";
+import { VectorPattern } from "@/_hooks/use-vector-pattern";
+import { LineWeight } from "@/_lib/line-weight";
 
 export default function SideMenu({
   menuStates,
@@ -30,6 +34,10 @@ export default function SideMenu({
   dispatchStitchSettings,
   patternScale,
   dispatchPatternScaleAction,
+  vector,
+  canFindPieces,
+  lineWeight,
+  hiddenLayerIds,
 }: {
   menuStates: MenuStates;
   setMenuStates: Dispatch<SetStateAction<MenuStates>>;
@@ -41,10 +49,15 @@ export default function SideMenu({
   stitchSettings: StitchSettings;
   patternScale: string;
   dispatchPatternScaleAction: Dispatch<PatternScaleAction>;
+  vector: VectorPattern;
+  canFindPieces: boolean;
+  lineWeight: LineWeight;
+  hiddenLayerIds: Set<string>;
 }) {
   const sc = useTranslations("ScaleMenu");
   const h = useTranslations("Header");
   const l = useTranslations("LayerMenu");
+  const pm = useTranslations("PiecesMenu");
 
   const numberOfLayers = Object.entries(layers).length;
   const disableStitchMenu =
@@ -54,6 +67,23 @@ export default function SideMenu({
     <menu className="pointer-events-auto flex w-fit">
       {/* reverse so the tooltips show on top */}
       <menu className="w-16 flex flex-col-reverse justify-end gap-2 p-2 bg-opacity-60 dark:bg-opacity-50 bg-white dark:bg-black left-0 border-b border-r dark:border-gray-700 transition-all duration-500">
+        <Tooltip
+          description={menuStates.pieces ? pm("menuHide") : pm("menuShow")}
+        >
+          <IconButton
+            active={menuStates.pieces}
+            onClick={() =>
+              setMenuStates(
+                toggleSideMenuStates(menuStates, SideMenuType.pieces),
+              )
+            }
+          >
+            <ScissorsIcon
+              ariaLabel={menuStates.pieces ? pm("menuHide") : pm("menuShow")}
+            />
+          </IconButton>
+        </Tooltip>
+
         <Tooltip description={menuStates.scale ? sc("hide") : sc("show")}>
           <IconButton
             active={menuStates.scale}
@@ -134,6 +164,15 @@ export default function SideMenu({
         <ScaleMenu
           patternScale={patternScale}
           dispatchPatternScaleAction={dispatchPatternScaleAction}
+        />
+      )}
+      {menuStates.pieces && file && (
+        <PiecesMenu
+          vector={vector}
+          canStart={canFindPieces}
+          fileName={file.name}
+          lineWeight={lineWeight}
+          hidden={hiddenLayerIds}
         />
       )}
       {menuStates.layers && (
